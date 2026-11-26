@@ -1,0 +1,3 @@
+import {NextResponse} from "next/server";import bcrypt from "bcryptjs";import {z} from "zod";import {prisma} from "@/lib/prisma";import {getSession} from "@/lib/session";
+const schema=z.object({username:z.string().min(1),password:z.string().min(1)});
+export async function POST(req:Request){try{const body=schema.parse(await req.json());const admin=await prisma.admin.findUnique({where:{username:body.username}});if(!admin||!(await bcrypt.compare(body.password,admin.passwordHash)))return NextResponse.json({error:"Invalid credentials"},{status:401});const s=await getSession();s.adminId=admin.id;delete s.customerId;await s.save();return NextResponse.json({ok:true});}catch{return NextResponse.json({error:"Invalid request"},{status:400});}}

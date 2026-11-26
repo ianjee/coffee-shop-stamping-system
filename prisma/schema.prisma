@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CredentialPurpose {
+  LOGIN
+  STAMP
+}
+
+enum RewardStatus {
+  AVAILABLE
+  REDEEMED
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  stamps       Stamp[]
+  redemptions  Reward[] @relation("RewardRedeemer")
+}
+
+model Customer {
+  id          String       @id @default(cuid())
+  name        String
+  status      String       @default("ACTIVE")
+  createdAt   DateTime     @default(now())
+  credentials Credential[]
+  stamps      Stamp[]
+  rewards     Reward[]
+}
+
+model Credential {
+  id        String           @id @default(cuid())
+  customerId String
+  tokenHash String           @unique
+  purpose   CredentialPurpose
+  createdAt DateTime         @default(now())
+  revokedAt DateTime?
+  customer  Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  @@index([customerId, purpose])
+}
+
+model Stamp {
+  id         String   @id @default(cuid())
+  customerId String
+  adminId    String
+  createdAt  DateTime @default(now())
+  customer   Customer @relation(fields: [customerId], references: [id])
+  admin      Admin    @relation(fields: [adminId], references: [id])
+  @@index([customerId, createdAt])
+}
+
+model Reward {
+  id                 String       @id @default(cuid())
+  customerId         String
+  requiredStamps     Int
+  name               String
+  status             RewardStatus @default(AVAILABLE)
+  createdAt          DateTime     @default(now())
+  redeemedAt         DateTime?
+  redeemedByAdminId  String?
+  customer           Customer     @relation(fields: [customerId], references: [id])
+  redeemedBy         Admin?       @relation("RewardRedeemer", fields: [redeemedByAdminId], references: [id])
+  @@index([customerId, status])
+}

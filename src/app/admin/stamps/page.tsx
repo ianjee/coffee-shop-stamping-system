@@ -1,0 +1,3 @@
+import {requireAdmin} from "@/lib/auth";import {prisma} from "@/lib/prisma";import Link from "next/link";
+export default async function Stamps(){await requireAdmin();const rows=await prisma.stamp.findMany({orderBy:{createdAt:"desc"},take:200,include:{customer:true,admin:true}});
+ return <main className="wrap"><h1 className="text-2xl font-bold">Stamp History</h1><p><Link href="/admin/dashboard">Dashboard</Link></p><div className="panel"><table><thead><tr><th>Customer</th><th>Approved by</th><th>Date</th></tr></thead><tbody>{rows.map(s=><tr key={s.id}><td>{s.customer.name}</td><td>{s.admin.username}</td><td>{s.createdAt.toLocaleString()}</td></tr>)}</tbody></table></div></main>}
