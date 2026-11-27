@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CartLogo from "./CartLogo";
 
 export function CupIcon({ size = 20 }: { size?: number }) {
   return (
@@ -14,7 +15,7 @@ export default function AdminNav() {
   return (
     <header className="topbar">
       <div className="topbar-in">
-        <Link href="/admin/dashboard" className="brand"><CupIcon size={22} /><span>Coffee Shop<small>Loyalty</small></span></Link>
+        <Link href="/admin/dashboard" className="brand"><CartLogo size={22} /><span>CoffeeSpot</span></Link>
         <nav>
           <Link href="/admin/dashboard">Dashboard</Link>
           <Link href="/admin/customers">Customers</Link>

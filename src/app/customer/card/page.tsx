@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { headers } from "next/headers";
 import { createStampToken, hashToken } from "@/lib/tokens";
 import { CupIcon } from "@/components/AdminNav";
+import CartLogo from "@/components/CartLogo";
 import CustomerQrDownload from "@/components/CustomerQrDownload";
 
 export const dynamic = "force-dynamic";
@@ -94,7 +95,7 @@ export default async function Card() {
   return (
     <main className="customer">
       <div className="customer-in">
-        <p className="eyebrow light">Coffee Shop Loyalty</p>
+        <p className="eyebrow light brand-line"><CartLogo size={26} />CoffeeSpot</p>
         <h1 className="greet">Hello, {customer.name}</h1>
 
         <section className="loyalty-card">

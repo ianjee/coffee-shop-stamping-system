@@ -182,3 +182,5 @@ tbody tr:hover { background: #fcf7ef; }
 @media (prefers-reduced-motion: reduce) {
   .bean-svg, .bean-shadow { animation-duration: 2.4s; }
 }
+
+.eyebrow.brand-line { display: flex; align-items: center; gap: 8px; font-size: .85rem; }

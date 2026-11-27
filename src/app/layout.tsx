@@ -8,7 +8,7 @@ const display = Fraunces({ subsets: ["latin"], variable: "--font-display" });
 const sans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Coffee Shop Stamping",
+  title: "CoffeeSpot",
   description: "Digital coffee shop loyalty card"
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
