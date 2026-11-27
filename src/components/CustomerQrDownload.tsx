@@ -6,7 +6,7 @@ type Props = {
 };
 
 export default function CustomerQrDownload({ qr }: Props) {
-  function downloadQr() {
+  async function downloadQr() {
     const canvas = document.createElement("canvas");
     canvas.width = 1000;
     canvas.height = 1200;
@@ -14,58 +14,62 @@ export default function CustomerQrDownload({ qr }: Props) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Rounded rectangle helper
-    function roundedRect(
-      x: number,
-      y: number,
-      width: number,
-      height: number,
-      radius: number,
-      color: string
-    ) {
-      ctx!.beginPath();
-      ctx!.roundRect(x, y, width, height, radius);
-      ctx!.fillStyle = color;
-      ctx!.fill();
-    }
+    const image = new Image();
 
-    // Outer latte background
-    roundedRect(0, 0, 1000, 1200, 0, "#B89573");
+    image.onload = () => {
+      // Background
+      ctx.fillStyle = "#B89573";
+      ctx.fillRect(0, 0, 1000, 1200);
 
-    // Soft mocha frame
-    roundedRect(24, 24, 952, 1152, 40, "#8C6B50");
+      // Outer mocha frame
+      ctx.fillStyle = "#8C6B50";
+      ctx.beginPath();
+      ctx.roundRect(24, 24, 952, 1152, 40);
+      ctx.fill();
 
-    // Warm ivory card
-    roundedRect(42, 42, 916, 1116, 28, "#F5EBDD");
+      // Ivory card
+      ctx.fillStyle = "#F5EBDD";
+      ctx.beginPath();
+      ctx.roundRect(42, 42, 916, 1116, 28);
+      ctx.fill();
 
-    // Shop name
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#5C4433";
-    ctx.font = "800 58px Arial, sans-serif";
+      // Shop name
+      ctx.fillStyle = "#5C4433";
+      ctx.font = "800 58px Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("COFFEE SPOTJ.ST6329", 500, 175);
 
-    const heading = "COFFEE SPOTJ.ST6329";
-    ctx.fillText(heading, 500, 190, 860);
+      // Gold QR border
+      ctx.fillStyle = "#C5A66D";
+      ctx.beginPath();
+      ctx.roundRect(60, 245, 880, 880, 18);
+      ctx.fill();
 
-    // Champagne-gold QR frame
-    roundedRect(60, 250, 880, 880, 18, "#C5A66D");
+      // White QR background
+      ctx.fillStyle = "#FFFFFF";
+      ctx.beginPath();
+      ctx.roundRect(72, 257, 856, 856, 12);
+      ctx.fill();
 
-    // White QR background
-    roundedRect(72, 262, 856, 856, 12, "#FFFFFF");
+      // Actual QR code
+      ctx.drawImage(image, 72, 257, 856, 856);
 
-    // Draw the existing QR without changing its destination
-    const qrImage = new Image();
-
-    qrImage.onload = () => {
-      ctx.drawImage(qrImage, 72, 262, 856, 856);
-
+      // Download
       const link = document.createElement("a");
       link.download = "Coffee-SpotJ-ST6329-QR.png";
       link.href = canvas.toDataURL("image/png");
+
+      document.body.appendChild(link);
       link.click();
+      link.remove();
     };
 
-    qrImage.src = qr;
+    image.onerror = () => {
+      alert("Unable to create the QR download. Please refresh and try again.");
+    };
+
+    image.src = qr;
   }
 
   return (
