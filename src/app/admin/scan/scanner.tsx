@@ -76,7 +76,7 @@ export default function Scanner() {
       {message === "Starting camera…" ? (
         <div className="center"><BeanLoader size={36} label={message} /></div>
       ) : (
-        <p className="hint center">{message}</p>
+        message.startsWith("Camera unavailable") && <p className="hint center">{message}</p>
       )}
       <form
         className="inline-form"
