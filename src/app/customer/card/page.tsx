@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { headers } from "next/headers";
 import { createStampToken, hashToken } from "@/lib/tokens";
 import { CupIcon } from "@/components/AdminNav";
+import CustomerQrDownload from "@/components/CustomerQrDownload";
 
 export const dynamic = "force-dynamic";
 
@@ -134,13 +135,7 @@ export default async function Card() {
             Show this same QR to the shop admin for stamps. Scan it with your
             phone to open your loyalty card.
           </p>
-          <img
-            src={qr}
-            alt="Your customer QR code"
-            width="320"
-            height="320"
-            className="qr"
-          />
+            <CustomerQrDownload qr={qr} />
           <p className="hint small">
             Keep this QR private. Anyone who has it can open this customer card.
           </p>
