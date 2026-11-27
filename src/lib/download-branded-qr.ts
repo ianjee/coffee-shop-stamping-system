@@ -36,7 +36,6 @@ export function downloadBrandedQr(qr: string) {
     fill = "#6E4932",
     crease = "#DFC4A3",
     alpha = 1,
-    strokeOnly = false,
     lineWidth = 2.2
   ) => {
     ctx.save();
@@ -47,10 +46,9 @@ export function downloadBrandedQr(qr: string) {
 
     ctx.beginPath();
     ctx.ellipse(0, 0, 12, 20, 0, 0, Math.PI * 2);
-    if (!strokeOnly) {
-      ctx.fillStyle = fill;
-      ctx.fill();
-    }
+    ctx.fillStyle = fill;
+    ctx.fill();
+
     ctx.strokeStyle = crease;
     ctx.lineWidth = lineWidth;
     ctx.stroke();
@@ -77,25 +75,13 @@ export function downloadBrandedQr(qr: string) {
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, W, H);
 
-  // Aesthetic repeating coffee bean background
   for (let y = -110; y < H + 140; y += 130) {
     for (let x = -110; x < W + 140; x += 155) {
-      const offsetX = ((Math.floor((y + 110) / 130) % 2) * 35);
-      drawBean(
-        x + offsetX,
-        y,
-        -0.52,
-        1.35,
-        "#5A3C2E",
-        "#DFC4A3",
-        0.085,
-        false,
-        2.5
-      );
+      const offsetX = (Math.floor((y + 110) / 130) % 2) * 35;
+      drawBean(x + offsetX, y, -0.52, 1.35, "#5A3C2E", "#DFC4A3", 0.085, 2.5);
     }
   }
 
-  // Soft vignette to keep center focus clean
   const vignette = ctx.createRadialGradient(cx, H * 0.5, 190, cx, H * 0.5, 920);
   vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
   vignette.addColorStop(1, "rgba(15, 8, 5, 0.34)");
@@ -130,7 +116,6 @@ export function downloadBrandedQr(qr: string) {
   ];
   topBeans.forEach(([x, y, rot, s]) => drawBean(x, y, rot, s));
 
-  // Delicate curved guide line
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(0, 310);
@@ -157,7 +142,7 @@ export function downloadBrandedQr(qr: string) {
 
   ctx.fillStyle = "#F6ECE0";
   ctx.font = "bold 50px Georgia, 'Times New Roman', serif";
-  ctx.fillText("COFFEE SPOTJ.ST6329", cx, 318, 840);
+  ctx.fillText("COFFEESPOT J.ST6329", cx, 318, 840);
 
   ctx.strokeStyle = "rgba(207, 168, 123, 0.65)";
   ctx.lineWidth = 1.75;
@@ -174,20 +159,20 @@ export function downloadBrandedQr(qr: string) {
   ctx.restore();
 
   // ---------------------------------
-  // 4. QR CODE FRAME
+  // 4. QR CODE FRAME (PRIMARY FOCUS)
   // ---------------------------------
 
-  const qrSize = 680;
-  const padding = 32;
+  const qrSize = 690;
+  const padding = 34;
   const outerSize = qrSize + padding * 2;
   const qrX = (W - outerSize) / 2;
-  const qrY = 472;
+  const qrY = 468;
 
   ctx.save();
-  ctx.shadowColor = "rgba(12, 6, 3, 0.42)";
-  ctx.shadowBlur = 36;
+  ctx.shadowColor = "rgba(12, 6, 3, 0.44)";
+  ctx.shadowBlur = 38;
   ctx.shadowOffsetY = 14;
-  fillRoundedRect(qrX - 10, qrY - 10, outerSize + 20, outerSize + 20, 28, "#E9DDCB");
+  fillRoundedRect(qrX - 10, qrY - 10, outerSize + 20, outerSize + 20, 28, "#EAD8BE");
   ctx.restore();
 
   fillRoundedRect(qrX, qrY, outerSize, outerSize, 20, "#FFFFFF");
@@ -195,143 +180,227 @@ export function downloadBrandedQr(qr: string) {
   ctx.save();
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#CBB192";
-  ctx.font = "500 20px system-ui, -apple-system, Arial, sans-serif";
+  ctx.fillStyle = "#D5BC9D";
+  ctx.font = "600 20px system-ui, -apple-system, Arial, sans-serif";
   ctx.letterSpacing = "3px";
   ctx.fillText("SCAN TO VIEW & EARN", cx, qrY + outerSize + 44, 800);
   ctx.letterSpacing = "0px";
   ctx.restore();
 
   // ---------------------------------
-  // 5. REFINED ILLUSTRATED COFFEE CUP
+  // 5. SUBTLE MOTORCYCLE COFFEE CART EMBLEM
   // ---------------------------------
 
   ctx.save();
-  ctx.translate(225, 1515);
+  ctx.translate(235, 1525);
+  ctx.scale(0.88, 0.88);
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 
-  // Soft ground shadow
-  const groundShadow = ctx.createRadialGradient(0, 86, 12, 0, 86, 132);
-  groundShadow.addColorStop(0, "rgba(10, 5, 2, 0.42)");
-  groundShadow.addColorStop(1, "rgba(10, 5, 2, 0)");
-  ctx.fillStyle = groundShadow;
+  const strokeMain = "rgba(218, 184, 140, 0.82)";
+  const strokeSoft = "rgba(218, 184, 140, 0.45)";
+  const goldAccent = "#D8A559";
+  const warmAmber = "#B86E2D";
+  const darkFill = "#2D190F";
+
+  // Soft circular crest halo behind cart (echoes round logo gently)
+  const crestGrad = ctx.createRadialGradient(0, -10, 20, 0, -10, 155);
+  crestGrad.addColorStop(0, "rgba(234, 216, 190, 0.11)");
+  crestGrad.addColorStop(0.75, "rgba(234, 216, 190, 0.04)");
+  crestGrad.addColorStop(1, "rgba(234, 216, 190, 0)");
+  ctx.fillStyle = crestGrad;
   ctx.beginPath();
-  ctx.ellipse(0, 86, 132, 20, 0, 0, Math.PI * 2);
+  ctx.arc(0, -10, 155, 0, Math.PI * 2);
   ctx.fill();
 
-  // Saucer body with subtle shading
-  const saucerGrad = ctx.createLinearGradient(-120, 54, 120, 96);
-  saucerGrad.addColorStop(0, "#462917");
-  saucerGrad.addColorStop(0.5, "#361E10");
-  saucerGrad.addColorStop(1, "#27150B");
-
-  ctx.fillStyle = saucerGrad;
-  ctx.strokeStyle = "rgba(184, 134, 88, 0.72)";
-  ctx.lineWidth = 2.5;
+  // Subtle ground shadow
+  ctx.fillStyle = "rgba(10, 5, 2, 0.35)";
   ctx.beginPath();
-  ctx.ellipse(0, 72, 120, 21, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 86, 142, 13, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.stroke();
 
-  // Subtle saucer foot ring
-  ctx.strokeStyle = "rgba(184, 134, 88, 0.45)";
-  ctx.lineWidth = 2;
+  // Umbrella pole
+  ctx.strokeStyle = strokeMain;
+  ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(-92, 82);
-  ctx.quadraticCurveTo(0, 98, 92, 82);
+  ctx.moveTo(-42, -16);
+  ctx.lineTo(-42, -96);
   ctx.stroke();
 
-  // Handle behind cup wall
-  ctx.save();
-  ctx.strokeStyle = "rgba(184, 134, 88, 0.75)";
-  ctx.lineWidth = 14;
-  ctx.beginPath();
-  ctx.moveTo(72, -16);
-  ctx.bezierCurveTo(126, -20, 128, 42, 70, 48);
-  ctx.stroke();
-
-  ctx.strokeStyle = "#341D10";
-  ctx.lineWidth = 8.5;
-  ctx.beginPath();
-  ctx.moveTo(72, -16);
-  ctx.bezierCurveTo(122, -18, 124, 39, 70, 45);
-  ctx.stroke();
-  ctx.restore();
-
-  // Cup body (clean straight-slight-taper cylinder)
-  const cupGrad = ctx.createLinearGradient(-80, 0, 80, 0);
-  cupGrad.addColorStop(0, "#492B18");
-  cupGrad.addColorStop(0.28, "#3B2212");
-  cupGrad.addColorStop(0.75, "#2E190D");
-  cupGrad.addColorStop(1, "#241309");
-
-  ctx.fillStyle = cupGrad;
-  ctx.strokeStyle = "rgba(184, 134, 88, 0.75)";
+  // Thatched umbrella canopy
+  const umbrellaGrad = ctx.createLinearGradient(-42, -135, -42, -82);
+  umbrellaGrad.addColorStop(0, "#E0AE63");
+  umbrellaGrad.addColorStop(1, "#B87A35");
+  ctx.fillStyle = umbrellaGrad;
+  ctx.strokeStyle = strokeMain;
   ctx.lineWidth = 2.5;
+
   ctx.beginPath();
-  ctx.moveTo(-78, -24);
-  ctx.lineTo(-72, 44);
-  ctx.quadraticCurveTo(-68, 64, 0, 65);
-  ctx.quadraticCurveTo(68, 64, 72, 44);
-  ctx.lineTo(78, -24);
+  ctx.moveTo(-124, -84);
+  ctx.quadraticCurveTo(-42, -142, 40, -84);
+  ctx.quadraticCurveTo(-42, -76, -124, -84);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
 
-  // Subtle vertical ceramic highlight on left side
-  ctx.strokeStyle = "rgba(246, 236, 224, 0.14)";
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.moveTo(-56, -12);
-  ctx.lineTo(-52, 42);
-  ctx.stroke();
-
-  // Coffee surface inside cup
-  const coffeeGrad = ctx.createRadialGradient(-8, -23, 6, 0, -22, 72);
-  coffeeGrad.addColorStop(0, "#C77932");
-  coffeeGrad.addColorStop(0.75, "#A85E20");
-  coffeeGrad.addColorStop(1, "#7E4314");
-
-  ctx.fillStyle = coffeeGrad;
-  ctx.beginPath();
-  ctx.ellipse(0, -22, 70, 12, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Clean rim edge
-  ctx.strokeStyle = "rgba(198, 148, 98, 0.82)";
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.ellipse(0, -24, 78, 15.5, 0, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Soft, tapered steam wisps
-  const steamConfigs = [
-    { x: -30, topY: -112, sway: -10 },
-    { x: 0, topY: -124, sway: 8 },
-    { x: 30, topY: -110, sway: -8 }
-  ];
-
-  steamConfigs.forEach(({ x, topY, sway }) => {
-    const steamGrad = ctx.createLinearGradient(x, -48, x, topY);
-    steamGrad.addColorStop(0, "rgba(224, 194, 158, 0.45)");
-    steamGrad.addColorStop(0.65, "rgba(224, 194, 158, 0.18)");
-    steamGrad.addColorStop(1, "rgba(224, 194, 158, 0)");
-
-    ctx.strokeStyle = steamGrad;
-    ctx.lineWidth = 2.5;
+  // Subtle umbrella rib lines
+  ctx.strokeStyle = "rgba(56, 33, 18, 0.45)";
+  ctx.lineWidth = 1.75;
+  [-86, -42, 2].forEach((rx) => {
     ctx.beginPath();
-    ctx.moveTo(x, -48);
-    ctx.bezierCurveTo(
-      x + sway,
-      -70,
-      x - sway,
-      -92,
-      x + sway * 0.5,
-      topY
-    );
+    ctx.moveTo(-42, -126);
+    ctx.quadraticCurveTo(rx, -105, rx * 1.15, -83);
     ctx.stroke();
   });
+
+  // Rear wheel (partially tucked under cart skirt)
+  const drawWheel = (wx: number, wy: number, r: number) => {
+    ctx.save();
+    ctx.translate(wx, wy);
+    ctx.fillStyle = "#1E1009";
+    ctx.strokeStyle = strokeMain;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = strokeSoft;
+    ctx.lineWidth = 1.75;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.58, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = goldAccent;
+    ctx.beginPath();
+    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  };
+
+  drawWheel(-38, 62, 22);
+  drawWheel(96, 60, 24);
+
+  // Espresso / Audio box on left of cart counter
+  fillRoundedRect(-108, -56, 46, 44, 5, "#9C4A26");
+  ctx.strokeStyle = strokeMain;
+  ctx.lineWidth = 2.2;
+  ctx.strokeRect(-108, -56, 46, 44);
+
+  // Speaker/gauge circle & tiny dials
+  ctx.fillStyle = darkFill;
+  ctx.beginPath();
+  ctx.arc(-85, -31, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = goldAccent;
+  ctx.beginPath();
+  ctx.arc(-85, -31, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Bottles / coffee gear on counter
+  fillRoundedRect(-54, -34, 10, 22, 2, "#E8D5B9");
+  fillRoundedRect(-40, -30, 9, 18, 2, "#C9A77F");
+  fillRoundedRect(-26, -36, 12, 24, 2, "#5E3B28");
+
+  // Cart counter deck
+  fillRoundedRect(-114, -14, 168, 12, 4, warmAmber);
+  ctx.strokeStyle = strokeMain;
+  ctx.lineWidth = 2.2;
+  ctx.strokeRect(-114, -14, 168, 12);
+
+  // Tiki / straw fringe skirt under counter
+  const skirtGrad = ctx.createLinearGradient(0, -2, 0, 56);
+  skirtGrad.addColorStop(0, "#DDA95E");
+  skirtGrad.addColorStop(1, "#A86E2B");
+  ctx.fillStyle = skirtGrad;
+  ctx.beginPath();
+  ctx.moveTo(-110, -2);
+  ctx.lineTo(48, -2);
+  ctx.lineTo(48, 54);
+  for (let fx = 48; fx >= -110; fx -= 12) {
+    ctx.lineTo(fx - 6, 47);
+    ctx.lineTo(fx - 12, 55);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  // Vertical straw texture strokes
+  ctx.strokeStyle = "rgba(56, 33, 18, 0.35)";
+  ctx.lineWidth = 1.5;
+  for (let sx = -102; sx <= 42; sx += 10) {
+    ctx.beginPath();
+    ctx.moveTo(sx, 2);
+    ctx.lineTo(sx, 48);
+    ctx.stroke();
+  }
+
+  // Scooter seat & backrest
+  fillRoundedRect(46, -44, 16, 36, 6, "#4A3124");
+  ctx.strokeStyle = strokeMain;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Scooter front body & leg shield
+  ctx.fillStyle = "#A44626";
+  ctx.strokeStyle = strokeMain;
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(52, -8);
+  ctx.lineTo(74, -8);
+  ctx.quadraticCurveTo(86, -34, 80, -52);
+  ctx.lineTo(92, -52);
+  ctx.quadraticCurveTo(96, -12, 86, 34);
+  ctx.lineTo(54, 34);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Front fender over front wheel
+  ctx.fillStyle = "#B6522E";
+  ctx.beginPath();
+  ctx.arc(96, 56, 26, Math.PI * 1.08, Math.PI * 1.88);
+  ctx.lineTo(96, 56);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Handlebar, headlight & windshield
+  ctx.strokeStyle = strokeMain;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(86, -52);
+  ctx.lineTo(86, -80);
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(234, 216, 190, 0.22)";
+  ctx.beginPath();
+  ctx.roundRect(83, -82, 7, 26, 3);
+  ctx.fill();
+  ctx.stroke();
+
+  // Headlight glow dot
+  ctx.fillStyle = "#F5D28B";
+  ctx.beginPath();
+  ctx.arc(97, -45, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Two subtle lightning sparks flanking the cart (nod to the logo)
+  const drawMiniBolt = (bx: number, by: number) => {
+    ctx.save();
+    ctx.translate(bx, by);
+    ctx.strokeStyle = "rgba(224, 174, 99, 0.5)";
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(4, -14);
+    ctx.lineTo(-4, -1);
+    ctx.lineTo(3, -1);
+    ctx.lineTo(-4, 14);
+    ctx.stroke();
+    ctx.restore();
+  };
+
+  drawMiniBolt(-136, -15);
+  drawMiniBolt(132, -15);
 
   ctx.restore();
 
