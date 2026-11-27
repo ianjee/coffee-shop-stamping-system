@@ -30,7 +30,7 @@ export default function Scanner() {
   const [token, setToken] = useState("");
 
   useEffect(() => {
-    let scanner: { start: (...args: any[]) => Promise<void>; stop: () => Promise<void> } | undefined;
+    let scanner: import("html5-qrcode").Html5Qrcode | undefined;
     let stopped = false;
 
     (async () => {
