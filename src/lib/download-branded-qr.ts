@@ -405,32 +405,134 @@ export function downloadBrandedQr(qr: string) {
   ctx.restore();
 
   // ---------------------------------
-  // 6. BOTTOM-RIGHT DECORATION
+  // 6. BOTTOM-RIGHT MEDIUM & DARK ROAST BEANS (FLUSH RIGHT)
   // ---------------------------------
 
+  const drawRoastBean = (
+    x: number,
+    y: number,
+    angle: number,
+    scaleX: number,
+    scaleY: number,
+    roast: {
+      light: string;
+      mid: string;
+      dark: string;
+      creaseDeep: string;
+      creaseLine: string;
+      highlight: string;
+      rim: string;
+    }
+  ) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.scale(scaleX, scaleY);
+
+    // Soft ground shadow beneath bean
+    ctx.save();
+    ctx.translate(-6, 12);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 56, 86, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(8, 4, 1, 0.48)";
+    ctx.filter = "blur(10px)";
+    ctx.fill();
+    ctx.restore();
+
+    // Clip to bean silhouette for realistic 3D roast shading
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 56, 86, 0, 0, Math.PI * 2);
+    ctx.save();
+    ctx.clip();
+
+    // 3D body gradient
+    const bodyGrad = ctx.createRadialGradient(-20, -30, 10, 4, 8, 112);
+    bodyGrad.addColorStop(0, roast.light);
+    bodyGrad.addColorStop(0.52, roast.mid);
+    bodyGrad.addColorStop(1, roast.dark);
+    ctx.fillStyle = bodyGrad;
+    ctx.fillRect(-70, -100, 140, 200);
+
+    // Warm rim reflection so dark roast separates cleanly from dark background
+    const rimGrad = ctx.createLinearGradient(-50, -60, 45, 70);
+    rimGrad.addColorStop(0, roast.rim);
+    rimGrad.addColorStop(0.45, "rgba(255, 228, 196, 0)");
+    rimGrad.addColorStop(1, "rgba(255, 228, 196, 0.12)");
+    ctx.fillStyle = rimGrad;
+    ctx.fillRect(-70, -100, 140, 200);
+
+    // Center crease shadow groove
+    ctx.beginPath();
+    ctx.moveTo(-2, -74);
+    ctx.bezierCurveTo(22, -46, -24, -18, -4, 8);
+    ctx.bezierCurveTo(16, 34, -18, 56, 2, 76);
+    ctx.strokeStyle = roast.creaseDeep;
+    ctx.lineWidth = 11;
+    ctx.lineCap = "round";
+    ctx.filter = "blur(2.5px)";
+    ctx.stroke();
+    ctx.filter = "none";
+
+    // Crisp inner seam line
+    ctx.beginPath();
+    ctx.moveTo(-2, -72);
+    ctx.bezierCurveTo(20, -45, -22, -18, -4, 8);
+    ctx.bezierCurveTo(14, 34, -16, 56, 2, 74);
+    ctx.strokeStyle = roast.creaseLine;
+    ctx.lineWidth = 3.2;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    // Natural roasted coffee oil sheen on upper-left lobe
+    ctx.save();
+    ctx.translate(-22, -28);
+    ctx.rotate(-0.35);
+    const sheenGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 34);
+    sheenGrad.addColorStop(0, roast.highlight);
+    sheenGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
+    ctx.fillStyle = sheenGrad;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 18, 34, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore(); // end clip
+
+    // Subtle warm edge highlight to keep silhouette crisp against dark espresso background
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 56, 86, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(234, 204, 168, 0.28)";
+    ctx.lineWidth = 1.75;
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
   ctx.save();
-  ctx.shadowColor = "rgba(15, 8, 5, 0.25)";
-  ctx.shadowBlur = 20;
-  ctx.shadowOffsetY = 6;
 
-  ctx.beginPath();
-  ctx.moveTo(W, 1390);
-  ctx.bezierCurveTo(925, 1345, 855, 1390, 850, 1470);
-  ctx.bezierCurveTo(845, 1540, 925, 1580, W, 1605);
-  ctx.closePath();
-  ctx.fillStyle = "#E8D5B9";
-  ctx.fill();
+  // Upper/back bean: Medium Roast (warm chestnut-cinnamon brown), flush against right edge
+  drawRoastBean(978, 1455, -0.32, 1.52, 1.46, {
+    light: "#9E643B",
+    mid: "#744424",
+    dark: "#4B2A14",
+    creaseDeep: "rgba(32, 15, 6, 0.58)",
+    creaseLine: "rgba(24, 10, 4, 0.85)",
+    highlight: "rgba(255, 224, 190, 0.32)",
+    rim: "rgba(235, 192, 148, 0.24)"
+  });
 
-  ctx.beginPath();
-  ctx.moveTo(W, 1530);
-  ctx.bezierCurveTo(940, 1500, 885, 1565, 900, 1640);
-  ctx.bezierCurveTo(915, 1700, 970, 1730, W, 1745);
-  ctx.closePath();
-  ctx.fillStyle = "#C9A77F";
-  ctx.fill();
+  // Lower/front bean: Dark Roast (deep French-roast espresso with glossy oil sheen), flush against right edge
+  drawRoastBean(952, 1605, -0.62, 1.6, 1.52, {
+    light: "#633B24",
+    mid: "#3D2214",
+    dark: "#1E0F08",
+    creaseDeep: "rgba(10, 4, 2, 0.72)",
+    creaseLine: "rgba(8, 3, 1, 0.92)",
+    highlight: "rgba(255, 228, 198, 0.38)",
+    rim: "rgba(222, 178, 134, 0.28)"
+  });
+
   ctx.restore();
-
-  drawBean(945, 1630, -0.5, 0.95, "#76513A", "#E8D5B9");
 
   // ---------------------------------
   // 7. RENDER QR & DOWNLOAD
