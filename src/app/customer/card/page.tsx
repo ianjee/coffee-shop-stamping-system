@@ -1,30 +1,58 @@
 import { requireCustomer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import QRCode from "qrcode";
+import { headers } from "next/headers";
 import { createStampToken, hashToken } from "@/lib/tokens";
 import { CupIcon } from "@/components/AdminNav";
 
 export const dynamic = "force-dynamic";
+
+async function getPublicBaseUrl() {
+  const configuredUrl = process.env.APP_URL?.replace(/\/+$/, "");
+  if (configuredUrl) return configuredUrl;
+
+  const requestHeaders = await headers();
+  const hostHeader =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const host = hostHeader?.split(",")[0]?.trim();
+
+  if (!host) return "http://localhost:3000";
+
+  const forwardedProtocol = requestHeaders.get("x-forwarded-proto");
+  const protocol =
+    forwardedProtocol?.split(",")[0]?.trim() ||
+    (process.env.NODE_ENV === "production" ? "https" : "http");
+
+  return `${protocol}://${host}`;
+}
 
 export default async function Card() {
   const customer = await requireCustomer();
   const token = createStampToken(customer.id, customer.stampTokenVersion);
   const tokenHash = hashToken(token);
 
-  // Existing customers created by the earlier version may not have this
-  // deterministic credential yet. Create it once, and revoke old random
-  // stamp credentials so only the stable QR remains active.
+  // Backfill the shared STAMP credential for customers created by older versions.
   const existing = await prisma.credential.findUnique({ where: { tokenHash } });
+
   if (!existing) {
     await prisma.$transaction(async (tx) => {
       const raced = await tx.credential.findUnique({ where: { tokenHash } });
       if (!raced) {
         await tx.credential.updateMany({
-          where: { customerId: customer.id, purpose: "STAMP", revokedAt: null },
+          where: {
+            customerId: customer.id,
+            purpose: "STAMP",
+            revokedAt: null
+          },
           data: { revokedAt: new Date() }
         });
+
         await tx.credential.create({
-          data: { customerId: customer.id, purpose: "STAMP", tokenHash }
+          data: {
+            customerId: customer.id,
+            purpose: "STAMP",
+            tokenHash
+          }
         });
       }
     });
@@ -33,17 +61,28 @@ export default async function Card() {
     existing.purpose !== "STAMP" ||
     existing.revokedAt
   ) {
-    throw new Error("Your stamp QR has been revoked. Ask the admin to regenerate your QR credentials.");
+    throw new Error(
+      "Your customer QR has been revoked. Ask the admin to regenerate your QR."
+    );
   }
 
-  const [stamps, rewards] = await Promise.all([
+  const [stamps, rewards, baseUrl] = await Promise.all([
     prisma.stamp.count({ where: { customerId: customer.id } }),
-    prisma.reward.findMany({ where: { customerId: customer.id, status: "AVAILABLE" } })
+    prisma.reward.findMany({
+      where: { customerId: customer.id, status: "AVAILABLE" }
+    }),
+    getPublicBaseUrl()
   ]);
 
-  const qr = await QRCode.toDataURL(token, { width: 280, margin: 2 });
+  // Encode a complete web URL, not a bare token. iPhone Camera can open it.
+  const qrUrl = `${baseUrl}/access/${token}`;
+  const qr = await QRCode.toDataURL(qrUrl, {
+    width: 320,
+    margin: 2,
+    errorCorrectionLevel: "M"
+  });
 
-  const PER_CARD = 10; // stamps needed to fill one card
+  const PER_CARD = 10;
   const filled = stamps % PER_CARD;
   const completed = Math.floor(stamps / PER_CARD);
 
@@ -65,21 +104,46 @@ export default async function Card() {
               </span>
             ))}
           </div>
-          <p className="lc-foot">{stamps} total stamp{stamps === 1 ? "" : "s"}{completed > 0 ? ` · ${completed} card${completed === 1 ? "" : "s"} completed` : ""}</p>
+          <p className="lc-foot">
+            {stamps} total stamp{stamps === 1 ? "" : "s"}
+            {completed > 0
+              ? ` · ${completed} card${completed === 1 ? "" : "s"} completed`
+              : ""}
+          </p>
         </section>
 
         <section className="panel">
           <h2>Rewards</h2>
-          {rewards.length === 0
-            ? <p className="hint">No rewards available yet. Keep collecting stamps!</p>
-            : <ul className="rewards">{rewards.map((reward) => <li key={reward.id}><CupIcon size={18} />{reward.name}</li>)}</ul>}
+          {rewards.length === 0 ? (
+            <p className="hint">No rewards available yet. Keep collecting stamps!</p>
+          ) : (
+            <ul className="rewards">
+              {rewards.map((reward) => (
+                <li key={reward.id}>
+                  <CupIcon size={18} />
+                  {reward.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="panel center">
-          <h2>Your stamp QR</h2>
-          <p className="hint">Show this code to the shop admin when you make a qualifying purchase.</p>
-          <img src={qr} alt="Your stamp QR code" width="280" height="280" className="qr" />
-          <p className="hint small">This QR remains valid until an admin regenerates your credentials.</p>
+          <h2>Your customer QR</h2>
+          <p className="hint">
+            Show this same QR to the shop admin for stamps. Scan it with your
+            phone to open your loyalty card.
+          </p>
+          <img
+            src={qr}
+            alt="Your customer QR code"
+            width="320"
+            height="320"
+            className="qr"
+          />
+          <p className="hint small">
+            Keep this QR private. Anyone who has it can open this customer card.
+          </p>
         </section>
       </div>
     </main>
