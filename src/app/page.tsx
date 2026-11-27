@@ -1,7 +1,15 @@
 import Link from "next/link";
+import { CupIcon } from "@/components/AdminNav";
 export default function Home() {
-  return <main className="wrap"><h1 className="text-3xl font-bold">Coffee Shop Loyalty</h1>
-    <p className="mt-3">Digital stamps, customer cards, and rewards.</p>
-    <div className="panel"><Link href="/admin/login">Admin login</Link></div>
-  </main>;
+  return (
+    <main className="hero">
+      <div className="hero-card">
+        <span className="hero-badge"><CupIcon size={30} /></span>
+        <p className="eyebrow">Digital loyalty card</p>
+        <h1>Every cup,<br />a little reward.</h1>
+        <p className="lede">Digital stamps, customer cards, and rewards for your coffee shop, all in one place.</p>
+        <Link href="/admin/login" className="btn">Admin login</Link>
+      </div>
+    </main>
+  );
 }

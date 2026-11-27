@@ -27,10 +27,11 @@ model Admin {
 }
 
 model Customer {
-  id          String       @id @default(cuid())
-  name        String
-  status      String       @default("ACTIVE")
-  createdAt   DateTime     @default(now())
+  id                String   @id @default(cuid())
+  name              String
+  status            String   @default("ACTIVE")
+  stampTokenVersion Int      @default(1)
+  createdAt         DateTime @default(now())
   credentials Credential[]
   stamps      Stamp[]
   rewards     Reward[]

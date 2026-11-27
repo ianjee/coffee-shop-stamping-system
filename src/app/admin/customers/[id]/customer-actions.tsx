@@ -10,7 +10,7 @@ export default function CustomerActions({id,active}:{id:string;active:boolean}){
   if(action==="regenerate"){setQr(d.qr);setUrl(d.url);}else location.reload();
  }
  return <div className="mt-4">
-  <div className="flex gap-3"><button onClick={()=>act(active?"deactivate":"activate")}>{active?"Deactivate":"Activate"}</button><button onClick={()=>act("regenerate")}>Regenerate QR credentials</button></div>
-  {qr&&<div className="mt-5"><h2 className="font-bold">New customer login QR</h2><img src={qr} alt="New login QR" width="240"/><p className="break-all">{url}</p><a href={qr} download="customer-login-qr.png">Download QR image</a></div>}
+  <div className="actions"><button className={active?"btn btn-outline":"btn"} onClick={()=>act(active?"deactivate":"activate")}>{active?"Deactivate":"Activate"}</button><button className="btn btn-outline" onClick={()=>act("regenerate")}>Regenerate QR credentials</button></div>
+  {qr&&<div className="qr-result"><h2>New customer login QR</h2><img src={qr} alt="New login QR" width="240" className="qr"/><p className="break-all hint">{url}</p><a href={qr} download="customer-login-qr.png" className="btn btn-outline">Download QR image</a></div>}
  </div>;
 }
