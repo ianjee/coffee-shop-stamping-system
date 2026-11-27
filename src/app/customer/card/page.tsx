@@ -78,9 +78,13 @@ export default async function Card() {
   // Encode a complete web URL, not a bare token. iPhone Camera can open it.
   const qrUrl = `${baseUrl}/access/${token}`;
   const qr = await QRCode.toDataURL(qrUrl, {
-    width: 320,
-    margin: 2,
-    errorCorrectionLevel: "M"
+    width: 1000,
+    margin: 4,
+    errorCorrectionLevel: "H",
+    color: {
+      dark: "#38251D",
+      light: "#FFFFFF"
+    }
   });
 
   const PER_CARD = 10;
