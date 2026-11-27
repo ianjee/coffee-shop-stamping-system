@@ -1,7 +1,9 @@
 "use client";
 import { useState } from "react";
+import { useLoader } from "@/components/LoadingProvider";
 
 export default function NewCustomerForm() {
+  const { run } = useLoader();
   const [name, setName] = useState("");
   const [result, setResult] = useState<{ url: string; qr: string } | null>(null);
   const [error, setError] = useState("");
@@ -9,12 +11,14 @@ export default function NewCustomerForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const response = await fetch("/api/customers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name })
+    const { response, data } = await run(async () => {
+      const response = await fetch("/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+      return { response, data: await response.json() };
     });
-    const data = await response.json();
     if (!response.ok) {
       setError(data.error || "Could not create customer");
       return;

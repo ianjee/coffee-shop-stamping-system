@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
+import { useLoader } from "@/components/LoadingProvider";
 export default function LoginForm() {
+  const { run } = useLoader();
   const [username,setUsername]=useState(""), [password,setPassword]=useState(""), [error,setError]=useState("");
   async function submit(e:React.FormEvent) {
     e.preventDefault(); setError("");
-    const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password})});
-    if(r.ok) location.href="/admin/dashboard"; else setError("Invalid username or password.");
+    const r=await run(()=>fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password})}));
+    if(r.ok) { run(()=>new Promise(()=>{})); location.href="/admin/dashboard"; } else setError("Invalid username or password.");
   }
   return <form className="panel form" onSubmit={submit}>
     <label className="field"><span>Username</span><input value={username} onChange={e=>setUsername(e.target.value)} required autoComplete="username" /></label>

@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLoader } from "@/components/LoadingProvider";
 import { downloadBrandedQr } from "@/lib/download-branded-qr";
 
 export default function CustomerActions({
@@ -11,17 +12,19 @@ export default function CustomerActions({
   id: string;
   active: boolean;
 }) {
+  const { run } = useLoader();
   const [qr, setQr] = useState("");
   const [url, setUrl] = useState("");
 
   async function act(action: string) {
-    const r = await fetch(`/api/customers/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action })
+    const { r, d } = await run(async () => {
+      const r = await fetch(`/api/customers/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action })
+      });
+      return { r, d: await r.json() };
     });
-
-    const d = await r.json();
 
     if (!r.ok) {
       alert(d.error || "Action failed");
@@ -32,6 +35,7 @@ export default function CustomerActions({
       setQr(d.qr);
       setUrl(d.url);
     } else {
+      run(() => new Promise(() => {}));
       location.reload();
     }
   }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BeanLoader from "@/components/BeanLoader";
+import { useLoader } from "@/components/LoadingProvider";
 
 function getCustomerToken(scannedValue: string) {
   const value = scannedValue.trim();
@@ -26,6 +28,7 @@ function getCustomerToken(scannedValue: string) {
 }
 
 export default function Scanner() {
+  const { run } = useLoader();
   const [message, setMessage] = useState("Starting camera…");
   const [token, setToken] = useState("");
 
@@ -45,6 +48,7 @@ export default function Scanner() {
             if (stopped) return;
             stopped = true;
             const customerToken = getCustomerToken(decodedText);
+            run(() => new Promise(() => {}));
             await scanner?.stop();
             window.location.href =
               "/admin/verify?token=" + encodeURIComponent(customerToken);
@@ -64,18 +68,23 @@ export default function Scanner() {
       stopped = true;
       scanner?.stop().catch(() => {});
     };
-  }, []);
+  }, [run]);
 
   return (
     <div className="panel">
       <div id="reader" className="reader" />
-      <p className="hint center">{message}</p>
+      {message === "Starting camera…" ? (
+        <div className="center"><BeanLoader size={36} label={message} /></div>
+      ) : (
+        <p className="hint center">{message}</p>
+      )}
       <form
         className="inline-form"
         onSubmit={(event) => {
           event.preventDefault();
           const customerToken = getCustomerToken(token);
           if (!customerToken) return;
+          run(() => new Promise(() => {}));
           window.location.href =
             "/admin/verify?token=" + encodeURIComponent(customerToken);
         }}

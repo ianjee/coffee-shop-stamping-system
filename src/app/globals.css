@@ -160,3 +160,25 @@ tbody tr:hover { background: #fcf7ef; }
   th, td { padding: 12px 10px; }
   .inline-form { flex-direction: column; }
 }
+
+/* ---------- Bean loader ---------- */
+.bean-loader { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; color: var(--mocha-dark); }
+.bean-svg { animation: bean-hop .9s cubic-bezier(.4,0,.3,1) infinite; transform-origin: 50% 90%; }
+.bean-shadow { width: 26px; height: 5px; border-radius: 50%; background: rgba(59,36,24,.22); animation: bean-shadow .9s cubic-bezier(.4,0,.3,1) infinite; }
+.bean-label { font-size: .82rem; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+@keyframes bean-hop {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(180deg); }
+}
+@keyframes bean-shadow {
+  0%, 100% { transform: scaleX(1); opacity: 1; }
+  50% { transform: scaleX(.55); opacity: .5; }
+}
+.loading-overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: rgba(245,235,221,.72); backdrop-filter: blur(2px); animation: loader-in .15s ease-out; }
+.loading-page { min-height: 60vh; display: grid; place-items: center; }
+@keyframes loader-in { from { opacity: 0; } to { opacity: 1; } }
+.btn-bean { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .bean-svg, .bean-shadow { animation-duration: 2.4s; }
+}

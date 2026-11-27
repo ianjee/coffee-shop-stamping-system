@@ -1,4 +1,6 @@
 import "./globals.css";
+import { Suspense } from "react";
+import LoadingProvider from "@/components/LoadingProvider";
 import type { Metadata } from "next";
 import { Fraunces, DM_Sans } from "next/font/google";
 
@@ -10,5 +12,5 @@ export const metadata: Metadata = {
   description: "Digital coffee shop loyalty card"
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body className={`${display.variable} ${sans.variable}`}>{children}</body></html>;
+  return <html lang="en"><body className={`${display.variable} ${sans.variable}`}><Suspense fallback={null}><LoadingProvider>{children}</LoadingProvider></Suspense></body></html>;
 }
